@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+
+<style>
+body{
+  margin:0;
+  width:1080px;
+  height:1920px;
+  background:transparent;
+  font-family: Arial, sans-serif;
+  color:white;
+  position:relative;
+}
+
+/* SAT */
+#clock{
+  position:absolute;
+  top:80px;      /* ← pomjeraj gore/dole */
+  left:820px;    /* ← pomjeraj lijevo/desno */
+  font-size:60px;
+  font-weight:bold;
+}
+
+/* DATUMI */
+#greg{
+  position:absolute;
+  top:200px;
+  left:150px;
+  font-size:40px;
+}
+
+#hijri{
+  position:absolute;
+  top:200px;
+  left:650px;
+  font-size:40px;
+}
+
+/* NAMAZI */
+.prayerName{
+  position:absolute;
+  font-size:70px;
+  font-weight:bold;
+}
+
+.prayerTime{
+  position:absolute;
+  font-size:70px;
+  font-weight:bold;
+}
+
+/* ODBROJAVANJE */
+#nextLabel{
+  position:absolute;
+  top:1500px;
+  left:300px;
+  font-size:50px;
+}
+
+#countdown{
+  position:absolute;
+  top:1580px;
+  left:350px;
+  font-size:100px;
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div id="clock"></div>
+
+<div id="greg">5 Mart 2026</div>
+<div id="hijri">15 Ramazan 1447</div>
+
+<!-- ===== NAMAZI (MIJENJAŠ PIXELE) ===== -->
+
+<div class="prayerName" style="top:400px; left:150px;">SABAH</div>
+<div class="prayerTime" style="top:400px; left:750px;">04:33</div>
+
+<div class="prayerName" style="top:520px; left:150px;">IZL. SUNCA</div>
+<div class="prayerTime" style="top:520px; left:750px;">06:03</div>
+
+<div class="prayerName" style="top:640px; left:150px;">PODNE</div>
+<div class="prayerTime" style="top:640px; left:750px;">11:51</div>
+
+<div class="prayerName" style="top:760px; left:150px;">IKINDIJA</div>
+<div class="prayerTime" style="top:760px; left:750px;">14:59</div>
+
+<div class="prayerName" style="top:880px; left:150px;">AKŠAM</div>
+<div class="prayerTime" style="top:880px; left:750px;">17:37</div>
+
+<div class="prayerName" style="top:1000px; left:150px;">JACIJA</div>
+<div class="prayerTime" style="top:1000px; left:750px;">18:56</div>
+
+<!-- ODBROJAVANJE -->
+<div id="nextLabel"></div>
+<div id="countdown"></div>
+
+<script>
+
+// SAT
+function updateClock(){
+  const now = new Date();
+  document.getElementById("clock").innerHTML =
+    now.toLocaleTimeString("sr-RS");
+}
+setInterval(updateClock,1000);
+updateClock();
+
+// VREMENA
+const prayers = [
+  {name:"SABAH", time:"04:33"},
+  {name:"PODNE", time:"11:51"},
+  {name:"IKINDIJA", time:"14:59"},
+  {name:"AKŠAM", time:"17:37"},
+  {name:"JACIJA", time:"18:56"}
+];
+
+// ODBROJAVANJE
+setInterval(()=>{
+  const now = new Date();
+  let next = null;
+
+  for(let p of prayers){
+    const [h,m] = p.time.split(":");
+    const t = new Date();
+    t.setHours(h,m,0);
+    if(t > now){
+      next = {name:p.name, time:t};
+      break;
+    }
+  }
+
+  if(!next){
+    const [h,m] = prayers[0].time.split(":");
+    const t = new Date();
+    t.setDate(t.getDate()+1);
+    t.setHours(h,m,0);
+    next = {name:"SABAH", time:t};
+  }
+
+  const diff = next.time - now;
+
+  const h = Math.floor(diff/1000/60/60);
+  const m = Math.floor((diff/1000/60)%60);
+  const s = Math.floor((diff/1000)%60);
+
+  document.getElementById("nextLabel").innerHTML =
+    "Sljedeći namaz: " + next.name;
+
+  document.getElementById("countdown").innerHTML =
+    String(h).padStart(2,'0') + ":" +
+    String(m).padStart(2,'0') + ":" +
+    String(s).padStart(2,'0');
+
+},1000);
+
+</script>
+
+</body>
+</html>
